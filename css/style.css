@@ -12,7 +12,7 @@ body {
 
 .media-info-msg {
   opacity: 1;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -23,8 +23,10 @@ body {
   background-color: salmon;
 }
 
-@media screen and (max-width: 380px) {
+@media screen and (max-width: 500px) {
   .media-info-msg {
-    opacity: 0;
+    /* opacity: 0; */
+    display: none;
+    /* 투명하게 화면을 덮고있는게 아니라 아예 화면에서 지워주도록 수정 */
   }
 }

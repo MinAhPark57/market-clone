@@ -19,14 +19,18 @@ const renderData = (data) => {
   const main = document.querySelector("main");
 
   //최근 데이터가 맨 위로 올라오도록 reverse
-  data.reverse().forEach((obj) => {
+  data.reverse().forEach(async (obj) => {
     const div = document.createElement("div");
     div.className = "item-list";
 
     const imgDiv = document.createElement("div");
     imgDiv.className = "item-list__img";
+
     const img = document.createElement("img");
-    img.src = obj.image;
+    const res = await fetch(`/images/${obj.id}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    img.src = url;
 
     const InfoDiv = document.createElement("div");
     InfoDiv.className = "item-list__info";

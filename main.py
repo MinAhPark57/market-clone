@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, Form, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -49,6 +49,20 @@ async def get_items():
 # rows = [['id',1],['title','팝니다'],['description','상태 좋아요']...]
 # dict(row) for row in rows
 # 결과 : [{id:1, title:'팝니다', description:'상태 좋아요'},{id:2, title : '   ' ,description:'  '}....]
+
+
+
+@app.get('/images/{item_id}')
+async def get_image(item_id):
+    cur = con.cursor()
+    #16진법
+    image_bytes = cur.execute(f"""
+                              SELECT image from items WHERE id={item_id}
+                              """).fetchone()[0] #열 1개만 가져오기 [0]번째 인덱스
+    
+    return Response(content=bytes.fromhex(image_bytes))
+
+
     
 app.mount("/", StaticFiles(directory="frontend", html= True), name="frontend")
 

@@ -4,6 +4,7 @@ const handleSubmitForm = async (event) => {
   event.preventDefault(); //submit 했을 때 자동 새로고침 막기
 
   const body = new FormData(form);
+  //세계시간 기준으로 보냄
   body.append("insertAt", new Date().getTime());
 
   try {

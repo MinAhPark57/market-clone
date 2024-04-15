@@ -3,10 +3,13 @@ const form = document.getElementById("write-form");
 const handleSubmitForm = async (event) => {
   event.preventDefault(); //submit 했을 때 자동 새로고침 막기
 
+  const body = new FormData(form);
+  body.append("insertAt", new Date().getTime());
+
   try {
     const res = await fetch("/items", {
       method: "POST",
-      body: new FormData(form),
+      body, //body: body 를 줄여서 쓸 수 있음
     });
 
     const data = await res.json(); // 응답을 데이터로 바꾸기

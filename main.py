@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, Form, Response
 from fastapi.staticfiles import StaticFiles
+from fastapi_login import LoginManager
+from fastapi_login.exceptions import InvalidCredentialsException
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import Annotated
@@ -24,6 +26,54 @@ cur.execute(f"""
 
 
 app = FastAPI()
+
+SERCRET = 'super-coding'
+manager = LoginManager(SERCRET,'/login')
+
+@manager.user_loader()
+def query_user(id):
+    con.row_factory = sqlite3.Row #컬럼명도 같이 가져옴
+    cur=con.cursor()
+    user = cur.execute(f"""
+                       SELECT * from users WHERE id='{id}'
+                       """).fetchone()
+    return user
+    
+@app.post('/login')
+def login(id:Annotated[str,Form()], 
+           password:Annotated[str,Form()]):
+    user = query_user(id)
+    if not user:
+        raise InvalidCredentialsException #에러메시지 던지기
+    elif password != user['password']:
+        raise InvalidCredentialsException #에러메시지 던지기
+    
+    access_token = manager.create_access_token(data={
+        'id':user['id'],
+        'name':user['name'],
+        'email':user['email']
+        
+    })
+    
+    return {'access_token':access_token} #'리턴값' 상관 없이 '상태코드' 자동으로 200
+
+
+
+@app.post('/signup')
+def signup(id:Annotated[str,Form()], 
+           password:Annotated[str,Form()],
+           name:Annotated[str,Form()],
+           email:Annotated[str,Form()]):
+    
+    #DB에 저장
+    #이미 회원가입이 되어있는 사람은 중복 가입 안되도록 처리 해야됨. (추가해보기)
+    cur.execute(f"""
+                INSERT INTO users(id,name,email,password)
+                VALUES ('{id}','{name}','{email}','{password}')
+                """)
+    con.commit()
+    return '200'
+
 
 
 @app.post('/items')
@@ -74,20 +124,7 @@ async def get_image(item_id):
     
     return Response(content=bytes.fromhex(image_bytes), media_type="image/*")
 
-@app.post('/signup')
-def signup(id:Annotated[str,Form()], 
-           password:Annotated[str,Form()],
-           name:Annotated[str,Form()],
-           email:Annotated[str,Form()]):
-    
-    #DB에 저장
-    #이미 회원가입이 되어있는 사람은 중복 가입 안되도록 처리 해야됨. (추가해보기)
-    cur.execute(f"""
-                INSERT INTO users(id,name,email,password)
-                VALUES ('{id}','{name}','{email}','{password}')
-                """)
-    con.commit()
-    return '200'
+
            
     
 app.mount("/", StaticFiles(directory="frontend", html= True), name="frontend")

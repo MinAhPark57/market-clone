@@ -27,8 +27,10 @@ const handleSubmit = async (event) => {
 
     //서버에서 성공 메시지 받았을때만 표시
     if (data === "200") {
-      div.innerText = "회원가입 성공";
-      div.style.color = "blue";
+      //   div.innerText = "회원가입 성공";
+      //   div.style.color = "blue";
+      alert("회원가입에 성공했습니다.");
+      window.location.pathname = "/login.html";
     }
   } else {
     div.innerText = "비밀번호가 같지 않습니다!";

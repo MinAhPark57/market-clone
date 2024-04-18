@@ -9,6 +9,18 @@ import sqlite3
 con = sqlite3.connect('db.db',check_same_thread=False) 
 cur = con.cursor()
 
+#테이블이 없을때만 테이블 생성  IF NOT EXISTS
+cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS items(
+	            id INTEGER PRIMARY KEY,
+	            title TEXT NOT NULL,
+	            image BLOB,
+	            price INTEGER NOT NULL,
+	            description TEXT,
+	            place TEXT NOT NULL,
+	            insertAt INTEGER NOT NULL
+            );
+            """)
 
 
 app = FastAPI()
